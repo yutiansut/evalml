@@ -27,7 +27,8 @@ class RFClassifierSelectFromModel(FeatureSelector):
                       "threshold": threshold}
         estimator = SKRandomForestClassifier(random_state=random_state,
                                              n_estimators=n_estimators,
-                                             max_depth=max_depth)
+                                             max_depth=max_depth,
+                                             n_jobs=n_jobs)
         feature_selection = SkSelect(
             estimator=estimator,
             max_features=max_features,
