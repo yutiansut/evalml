@@ -5,6 +5,7 @@ from evalml.model_types import ModelTypes
 from evalml.pipelines import PipelineBase
 from evalml.pipelines.components import CatBoostRegressor, SimpleImputer
 from evalml.problem_types import ProblemTypes
+from evalml.utils import get_random_state
 
 
 class CatBoostRegressionPipeline(PipelineBase):
@@ -29,14 +30,12 @@ class CatBoostRegressionPipeline(PipelineBase):
                  n_jobs=-1, random_state=0):
         # note: impute_strategy must support both string and numeric data
         imputer = SimpleImputer(impute_strategy=impute_strategy)
-        catboost_random_state = random_state
-        if isinstance(random_state, np.random.RandomState):
-            catboost_random_state = random_state.randint(np.iinfo(np.int32).max)
+        random_state = get_random_state(random_state)
         estimator = CatBoostRegressor(n_estimators=n_estimators,
                                       eta=eta,
                                       max_depth=max_depth,
                                       bootstrap_type=bootstrap_type,
-                                      random_state=catboost_random_state)
+                                      random_state=random_state.randint(np.iinfo(np.int32).max))
         super().__init__(objective=objective,
                          component_list=[imputer, estimator],
                          n_jobs=n_jobs,
