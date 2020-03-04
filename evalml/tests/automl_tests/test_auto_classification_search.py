@@ -190,7 +190,15 @@ def test_random_state(X_y):
 def test_debug_failure(X_y):
     X, y = X_y
 
-    automl = AutoClassificationSearch(objective=Precision(), max_pipelines=5, random_state=0)
+    automl = AutoClassificationSearch(objective=Precision(), max_pipelines=1, random_state=0)
+    automl.search(X, y, raise_errors=True)
+    automl = AutoClassificationSearch(objective=Precision(), max_pipelines=1, random_state=0)
+    automl.search(X, y, raise_errors=True)
+    automl = AutoClassificationSearch(objective=Precision(), max_pipelines=1, random_state=0)
+    automl.search(X, y, raise_errors=True)
+    automl = AutoClassificationSearch(objective=Precision(), max_pipelines=1, random_state=0)
+    automl.search(X, y, raise_errors=True)
+    automl = AutoClassificationSearch(objective=Precision(), max_pipelines=1, random_state=0)
     automl.search(X, y, raise_errors=True)
 
 
