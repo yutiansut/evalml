@@ -187,6 +187,34 @@ def test_random_state(X_y):
     assert automl.rankings.equals(automl_1.rankings)
 
 
+def test_debug_failure(X_y):
+    X, y = X_y
+
+    automl = AutoClassificationSearch(objective=Precision(), max_pipelines=5, random_state=0)
+    automl.search(X, y, raise_errors=True)
+
+    automl_1 = AutoClassificationSearch(objective=Precision(), max_pipelines=5, random_state=0)
+    automl_1.search(X, y, raise_errors=True)
+    assert automl.rankings.equals(automl_1.rankings)
+
+    automl_1 = AutoClassificationSearch(objective=Precision(), max_pipelines=5, random_state=0)
+    automl_1.search(X, y, raise_errors=True)
+    automl_1 = AutoClassificationSearch(objective=Precision(), max_pipelines=5, random_state=0)
+    automl_1.search(X, y, raise_errors=True)
+    automl_1 = AutoClassificationSearch(objective=Precision(), max_pipelines=5, random_state=0)
+    automl_1.search(X, y, raise_errors=True)
+    automl_1 = AutoClassificationSearch(objective=Precision(), max_pipelines=5, random_state=0)
+    automl_1.search(X, y, raise_errors=True)
+    automl_1 = AutoClassificationSearch(objective=Precision(), max_pipelines=5, random_state=0)
+    automl_1.search(X, y, raise_errors=True)
+    automl_1 = AutoClassificationSearch(objective=Precision(), max_pipelines=5, random_state=0)
+    automl_1.search(X, y, raise_errors=True)
+    automl_1 = AutoClassificationSearch(objective=Precision(), max_pipelines=5, random_state=0)
+    automl_1.search(X, y, raise_errors=True)
+    automl_1 = AutoClassificationSearch(objective=Precision(), max_pipelines=5, random_state=0)
+    automl_1.search(X, y, raise_errors=True)
+
+
 def test_callback(X_y):
     X, y = X_y
 

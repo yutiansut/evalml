@@ -15,13 +15,7 @@ from .regression import (
 from evalml.model_types import handle_model_types
 from evalml.problem_types import handle_problem_types
 
-ALL_PIPELINES = [RFClassificationPipeline,
-                 XGBoostPipeline,
-                 LogisticRegressionPipeline,
-                 LinearRegressionPipeline,
-                 RFRegressionPipeline,
-                 CatBoostClassificationPipeline,
-                 CatBoostRegressionPipeline]
+ALL_PIPELINES = [RFClassificationPipeline]
 
 
 def get_pipelines(problem_type, model_types=None):
