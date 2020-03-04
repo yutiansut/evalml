@@ -5,6 +5,7 @@ from evalml.model_types import ModelTypes
 from evalml.pipelines import PipelineBase
 from evalml.pipelines.components import CatBoostClassifier, SimpleImputer
 from evalml.problem_types import ProblemTypes
+from evalml.utils import get_random_state
 
 
 class CatBoostClassificationPipeline(PipelineBase):

@@ -10,6 +10,7 @@ from evalml.pipelines.components import (
     XGBoostClassifier
 )
 from evalml.problem_types import ProblemTypes
+from evalml.utils import get_random_state
 
 
 class XGBoostPipeline(PipelineBase):
