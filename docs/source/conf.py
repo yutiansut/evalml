@@ -53,7 +53,26 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
     'sphinx.ext.extlinks',
+    'sphinx.ext.inheritance_diagram',
+    'autoapi.extension',
 ]
+
+# configure the autoapi plugin
+autoapi_dirs = ['../../evalml']
+
+autoapi_modules = {
+    'automl': {},
+    'demos': {},
+    'exceptions': {},
+    'guardrails': {},
+    'model_family': {},
+    'objectives': {},
+    'pipelines': {},
+    'preprocessing': {},
+    'problem_types': {},
+    'tuners': {},
+    'utils': {},
+}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
