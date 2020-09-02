@@ -6,8 +6,6 @@ import traceback
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
-import tqdm
-
 
 def get_logger(name):
     logger = logging.getLogger(name)
@@ -53,6 +51,26 @@ def log_subtitle(logger, title, underline="="):
     logger.info(underline * len(title))
 
 
+def format_interval(t):
+    """
+    Formats a number of seconds as a clock time, [H:]MM:SS
+    Parameters
+    ----------
+    t  : int
+        Number of seconds.
+    Returns
+    -------
+    out  : str
+        [H:]MM:SS
+    """
+    mins, s = divmod(int(t), 60)
+    h, m = divmod(mins, 60)
+    if h:
+        return '{0:d}:{1:02d}:{2:02d}'.format(h, m, s)
+    else:
+        return '{0:02d}:{1:02d}'.format(m, s)
+
+
 def time_elapsed(start_time):
     """How much time has elapsed since the search started.
 
@@ -62,7 +80,7 @@ def time_elapsed(start_time):
     Returns:
         str: elapsed time formatted as a string [H:]MM:SS
     """
-    return tqdm.std.tqdm.format_interval(time.time() - start_time)
+    return format_interval(time.time() - start_time)
 
 
 def update_pipeline(logger, pipeline_name, current_iteration, max_pipelines, start_time):
