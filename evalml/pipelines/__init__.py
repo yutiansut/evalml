@@ -25,6 +25,7 @@ from .components import (
 )
 
 from .pipeline_base import PipelineBase
+from .pipeline_base_meta import PipelineBaseMeta
 from .classification_pipeline import ClassificationPipeline
 from .binary_classification_pipeline import BinaryClassificationPipeline
 from .multiclass_classification_pipeline import MulticlassClassificationPipeline

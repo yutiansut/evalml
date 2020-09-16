@@ -3,10 +3,15 @@ import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 
 from evalml.objectives import get_objective
-from evalml.pipelines import PipelineBase
+from evalml.pipelines import PipelineBase, PipelineBaseMeta
 
 
-class ClassificationPipeline(PipelineBase):
+class ClassificationPipelineMeta(PipelineBaseMeta):
+    """A version of the PipelineBaseMeta class which includes validation of additional parameters"""
+    PROPERTIES_TO_CHECK = PipelineBaseMeta.PROPERTIES_TO_CHECK + ['classes_']
+
+
+class ClassificationPipeline(PipelineBase, metaclass=ClassificationPipelineMeta):
     """Pipeline subclass for all classification pipelines."""
 
     def __init__(self, parameters, random_state=0):
@@ -62,8 +67,6 @@ class ClassificationPipeline(PipelineBase):
     @property
     def classes_(self):
         """Gets the class names for the problem."""
-        if not hasattr(self._encoder, "classes_"):
-            raise AttributeError("Cannot access class names before fitting the pipeline.")
         return self._encoder.classes_
 
     def _predict(self, X, objective=None):
