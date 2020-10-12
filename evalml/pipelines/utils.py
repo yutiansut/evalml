@@ -17,7 +17,8 @@ from evalml.pipelines.components import (  # noqa: F401
     Imputer,
     OneHotEncoder,
     RandomForestClassifier,
-    StandardScaler
+    StandardScaler,
+    PCA
 )
 from evalml.pipelines.components.utils import get_estimators
 from evalml.problem_types import ProblemTypes, handle_problem_types
@@ -60,6 +61,8 @@ def _get_preprocessing_components(X, y, problem_type, estimator_class):
 
     if estimator_class.model_family == ModelFamily.LINEAR_MODEL:
         pp_components.append(StandardScaler)
+
+    pp_components.append(PCA)
     return pp_components
 
 
