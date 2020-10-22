@@ -66,7 +66,7 @@ class ClassificationPipeline(PipelineBase):
             raise AttributeError("Cannot access class names before fitting the pipeline.")
         return self._encoder.classes_
 
-    def _predict(self, X, objective=None):
+    def _predict(self, X, y=None, objective=None):
         """Make predictions using selected features.
 
         Arguments:
@@ -78,10 +78,10 @@ class ClassificationPipeline(PipelineBase):
         """
         if not isinstance(X, pd.DataFrame):
             X = pd.DataFrame(X)
-        X_t = self.compute_estimator_features(X)
+        X_t = self.compute_estimator_features(X, y)
         return self.estimator.predict(X_t)
 
-    def predict(self, X, objective=None):
+    def predict(self, X, y=None, objective=None):
         """Make predictions using selected features.
 
         Arguments:
@@ -91,10 +91,10 @@ class ClassificationPipeline(PipelineBase):
         Returns:
             pd.Series : Estimated labels
         """
-        predictions = self._predict(X, objective)
+        predictions = self._predict(X, y, objective)
         return pd.Series(self._decode_targets(predictions))
 
-    def predict_proba(self, X):
+    def predict_proba(self, X, y=None):
         """Make probability estimates for labels.
 
         Arguments:
@@ -106,8 +106,8 @@ class ClassificationPipeline(PipelineBase):
         if not isinstance(X, pd.DataFrame):
             X = pd.DataFrame(X)
 
-        X = self.compute_estimator_features(X)
-        proba = self.estimator.predict_proba(X)
+        X = self.compute_estimator_features(X, y)
+        proba = self.estimator.predict_proba(X, y)
         proba.columns = self._encoder.classes_
         return proba
 
@@ -129,11 +129,11 @@ class ClassificationPipeline(PipelineBase):
 
         objectives = [get_objective(o, return_instance=True) for o in objectives]
         y = self._encode_targets(y)
-        y_predicted, y_predicted_proba = self._compute_predictions(X, objectives)
+        y_predicted, y_predicted_proba = self._compute_predictions(X, objectives, y)
 
         return self._score_all_objectives(X, y, y_predicted, y_predicted_proba, objectives)
 
-    def _compute_predictions(self, X, objectives):
+    def _compute_predictions(self, X, objectives, y=None):
         """Scan through the objectives list and precompute"""
         y_predicted = None
         y_predicted_proba = None
@@ -141,5 +141,5 @@ class ClassificationPipeline(PipelineBase):
             if objective.score_needs_proba and y_predicted_proba is None:
                 y_predicted_proba = self.predict_proba(X)
             if not objective.score_needs_proba and y_predicted is None:
-                y_predicted = self._predict(X)
+                y_predicted = self._predict(X, y)
         return y_predicted, y_predicted_proba

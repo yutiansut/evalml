@@ -51,7 +51,7 @@ def test_binary_classification_pipeline_predict(mock_predict, mock_predict_proba
 
     # test custom threshold set and objective passed
     binary_pipeline.threshold = 0.6
-    binary_pipeline.predict(X, 'precision')
+    binary_pipeline.predict(X, y=None, objective='precision')
     for mock_obj in mock_objs:
         mock_obj.assert_called()
         mock_obj.reset_mock()
@@ -65,5 +65,5 @@ def test_binary_predict_pipeline_objective_mismatch(mock_transform, X_y_binary, 
     binary_pipeline = dummy_binary_pipeline_class(parameters={})
     binary_pipeline.fit(X, y)
     with pytest.raises(ValueError, match="You can only use a binary classification objective to make predictions for a binary classification pipeline."):
-        binary_pipeline.predict(X, "precision micro")
+        binary_pipeline.predict(X, y=None, objective="precision micro")
     mock_transform.assert_called()

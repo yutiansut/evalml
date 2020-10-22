@@ -15,14 +15,14 @@ class PipelineBaseMeta(BaseMeta):
             It raises an exception if `False` and calls and returns the wrapped method if `True`.
         """
         @wraps(method)
-        def _check_for_fit(self, X=None, y=None):
+        def _check_for_fit(self, X=None, y=None, objective=None):
             klass = type(self).__name__
             if not self._is_fitted:
                 raise PipelineNotYetFittedError(f'This {klass} is not fitted yet. You must fit {klass} before calling {method.__name__}.')
             elif X is None and y is None:
                 return method(self)
-            elif y is None:
-                return method(self, X)
-            else:
+            elif method.__name__ == 'predict_proba':
                 return method(self, X, y)
+            else:
+                return method(self, X, y, objective)
         return _check_for_fit

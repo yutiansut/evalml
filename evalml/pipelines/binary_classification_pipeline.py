@@ -19,7 +19,7 @@ class BinaryClassificationPipeline(ClassificationPipeline):
     def threshold(self, value):
         self._threshold = value
 
-    def _predict(self, X, objective=None):
+    def _predict(self, X, y=None, objective=None):
         """Make predictions using selected features.
 
         Arguments:
@@ -31,7 +31,7 @@ class BinaryClassificationPipeline(ClassificationPipeline):
         """
         if not isinstance(X, pd.DataFrame):
             X = pd.DataFrame(X)
-        X_t = self.compute_estimator_features(X)
+        X_t = self.compute_estimator_features(X, y)
 
         if objective is not None:
             objective = get_objective(objective, return_instance=True)
@@ -40,13 +40,13 @@ class BinaryClassificationPipeline(ClassificationPipeline):
 
         if self.threshold is None:
             return self.estimator.predict(X_t)
-        ypred_proba = self.predict_proba(X)
+        ypred_proba = self.predict_proba(X, y)
         ypred_proba = ypred_proba.iloc[:, 1]
         if objective is None:
             return ypred_proba > self.threshold
         return objective.decision_function(ypred_proba, threshold=self.threshold, X=X)
 
-    def predict_proba(self, X):
+    def predict_proba(self, X, y=None):
         """Make probability estimates for labels. Assumes that the column at index 1 represents the positive label case.
 
         Arguments:
@@ -55,7 +55,7 @@ class BinaryClassificationPipeline(ClassificationPipeline):
         Returns:
             pd.DataFrame: probability estimates
         """
-        return super().predict_proba(X)
+        return super().predict_proba(X, y)
 
     @staticmethod
     def _score(X, y, predictions, objective):

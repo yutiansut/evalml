@@ -119,6 +119,7 @@ def test_all_problem_types():
     expected = [
         ProblemTypes.BINARY,
         ProblemTypes.MULTICLASS,
-        ProblemTypes.REGRESSION
+        ProblemTypes.REGRESSION,
+        ProblemTypes.TIME_SERIES_REGRESSION
     ]
     assert ProblemTypes.all_problem_types == expected
