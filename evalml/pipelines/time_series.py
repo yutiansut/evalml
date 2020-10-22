@@ -1,3 +1,6 @@
-import pandas  as pd
+from evalml.pipelines.regression_pipeline import RegressionPipeline
+from evalml.problem_types import ProblemTypes
 
-from evalml.pipelines.classification_pipeline im
+
+class TimeSeriesRegressionPipeline(RegressionPipeline):
+    problem_type = ProblemTypes.TIME_SERIES_REGRESSION
