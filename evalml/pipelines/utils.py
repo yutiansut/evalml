@@ -8,6 +8,7 @@ from .regression_pipeline import RegressionPipeline
 
 from evalml.model_family import ModelFamily
 from evalml.pipelines.components import (  # noqa: F401
+    LDA,
     CatBoostClassifier,
     CatBoostRegressor,
     ComponentBase,
@@ -60,6 +61,9 @@ def _get_preprocessing_components(X, y, problem_type, estimator_class):
 
     if estimator_class.model_family == ModelFamily.LINEAR_MODEL:
         pp_components.append(StandardScaler)
+    
+    if problem_type is not ProblemTypes.REGRESSION:
+        pp_components.append(LDA)
     return pp_components
 
 
