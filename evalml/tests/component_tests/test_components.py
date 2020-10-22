@@ -33,6 +33,7 @@ from evalml.pipelines.components import (
     ExtraTreesClassifier,
     ExtraTreesRegressor,
     Imputer,
+    LaggedFeatureExtractor,
     LightGBMClassifier,
     LinearRegressor,
     LogisticRegressionClassifier,
@@ -529,6 +530,8 @@ def test_transformer_transform_output_type(X_y_binary):
                 assert transform_output.shape[0] == X.shape[0]
                 assert transform_output.shape[1] <= X.shape[1]
                 assert isinstance(transform_output.columns, pd.Index)
+            elif isinstance(component, LaggedFeatureExtractor):
+                assert transform_output.shape == (X.shape[0], 63)
             else:
                 assert transform_output.shape == X.shape
                 assert (transform_output.columns == X_cols_expected).all()
@@ -543,6 +546,8 @@ def test_transformer_transform_output_type(X_y_binary):
                 assert transform_output.shape[0] == X.shape[0]
                 assert transform_output.shape[1] <= X.shape[1]
                 assert isinstance(transform_output.columns, pd.Index)
+            elif isinstance(component, LaggedFeatureExtractor):
+                assert transform_output.shape == (X.shape[0], 63)
             else:
                 assert transform_output.shape == X.shape
                 assert (transform_output.columns == X_cols_expected).all()
