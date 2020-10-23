@@ -56,8 +56,11 @@ class TimeSeriesRegressionPipeline(RegressionPipeline):
     def predict(self, X, y=None, objective=None):
         # Need to drop nans before feeding to the estimator
         features = self.compute_estimator_features(X, y)
-        predictions = self.estimator.predict(features.dropnan())
-        return pad_with_nans(predictions, self.time_series_problem)
+        predictions = self.estimator.predict(features.dropna(axis=0, how="any"))
+        if features.isna().any(axis=1).any():
+            return pad_with_nans(predictions, self.time_series_problem.max_lag)
+        else:
+            return predictions
 
     def score(self, X, y, objectives):
         # Override score to not change ObjectiveBase
