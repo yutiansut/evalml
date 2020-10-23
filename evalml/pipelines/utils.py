@@ -5,6 +5,7 @@ from .multiclass_classification_pipeline import (
     MulticlassClassificationPipeline
 )
 from .regression_pipeline import RegressionPipeline
+from .time_series import TimeSeriesRegressionPipeline
 
 from evalml.model_family import ModelFamily
 from evalml.pipelines.components import (  # noqa: F401
@@ -73,6 +74,8 @@ def _get_pipeline_base_class(problem_type):
         return MulticlassClassificationPipeline
     elif problem_type == ProblemTypes.REGRESSION:
         return RegressionPipeline
+    elif problem_type == ProblemTypes.TIME_SERIES_REGRESSION:
+        return TimeSeriesRegressionPipeline
 
 
 def make_pipeline(X, y, estimator, problem_type):
@@ -163,24 +166,3 @@ def _make_stacked_ensemble_pipeline(input_pipelines, problem_type):
         return make_pipeline_from_components([StackedEnsembleClassifier(input_pipelines)], problem_type, custom_name="Stacked Ensemble Classification Pipeline")
     else:
         return make_pipeline_from_components([StackedEnsembleRegressor(input_pipelines)], problem_type, custom_name="Stacked Ensemble Regression Pipeline")
-
-
-def pad_with_nans(pd_data, num_to_pad):
-    if isinstance(pd_data, pd.Series):
-        padding = pd.Series([None] * num_to_pad)
-    else:
-        padding = pd.DataFrame({col: [None] * num_to_pad
-                               for col in pd_data.columns})
-    return pd.concat([padding, pd_data], ignore_index=True).infer_objects()
-
-
-def drop_nan(pd_data_1, pd_data_2):
-
-    def _not_nan(pd_data):
-        if isinstance(pd_data, pd.Series):
-            return ~pd_data.isna()
-        else:
-            return ~pd_data.isna().any(axis=1)
-
-    mask = _not_nan(pd_data_1) & _not_nan(pd_data_2)
-    return pd_data_1.loc[mask], pd_data_2.loc[mask]

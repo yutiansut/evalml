@@ -5,6 +5,7 @@ from evalml.pipelines.components.transformers.transformer import Transformer
 
 class LaggedFeatureExtractor(Transformer):
     name = "Lagged Feature Extractor"
+    needs_time_series_parameters = True
 
     def __init__(self, max_lag=2, gap=1, random_state=0, **kwargs):
 

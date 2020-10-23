@@ -42,9 +42,7 @@ from evalml.pipelines.components.utils import (
     allowed_model_families
 )
 from evalml.pipelines.utils import (
-    drop_nan,
     get_estimators,
-    pad_with_nans,
     make_pipeline,
     make_pipeline_from_components
 )
@@ -1422,39 +1420,3 @@ def test_pipeline_repr(pipeline_class):
     pipeline_with_nan_parameters = MockPipeline(parameters={'Imputer': {'numeric_fill_value': float('nan'), 'categorical_fill_value': np.nan}})
     expected_repr = f"MockPipeline(parameters={{'Imputer':{{'categorical_impute_strategy': 'most_frequent', 'numeric_impute_strategy': 'mean', 'categorical_fill_value': np.nan, 'numeric_fill_value': np.nan}}, '{final_estimator}':{{'n_estimators': 100, 'max_depth': 6, 'n_jobs': -1}},}})"
     assert repr(pipeline_with_nan_parameters) == expected_repr
-
-
-def _check_equality(data, expected, check_index_type=True):
-    if isinstance(data, pd.Series):
-        pd.testing.assert_series_equal(data, expected, check_index_type)
-    else:
-        pd.testing.assert_frame_equal(data, expected, check_index_type)
-
-
-@pytest.mark.parametrize("data,num_to_pad,expected",
-                         [(pd.Series([1, 2, 3]), 1, pd.Series([np.nan, 1, 2, 3])),
-                          (pd.Series([1, 2, 3]), 0, pd.Series([1, 2, 3])),
-                          (pd.Series([1, 2, 3, 4], index=pd.date_range("2020-10-01", "2020-10-04")),
-                                     2, pd.Series([np.nan, np.nan, 1, 2, 3, 4])),
-                          (pd.DataFrame({"a": [1., 2., 3.], "b": [4., 5., 6.]}), 0,
-                           pd.DataFrame({"a": [1., 2., 3.], "b": [4., 5., 6.]})),
-                          (pd.DataFrame({"a": [4, 5, 6], "b": ["a", "b", "c"]}), 1,
-                           pd.DataFrame({"a": [np.nan, 4, 5, 6], "b": [np.nan, "a", "b", "c"]}))])
-def test_pad_with_nans(data, num_to_pad, expected):
-    padded = pad_with_nans(data, num_to_pad)
-    _check_equality(padded, expected)
-
-
-@pytest.mark.parametrize("data, expected",
-                         [(
-                           [pd.Series([None, 1., 2., 3]), pd.DataFrame({"a": [1., 2., 3, None]})],
-                           [pd.Series([1., 2.], index=pd.Int64Index([1, 2])),
-                            pd.DataFrame({"a": [2., 3.]}, index=pd.Int64Index([1, 2]))]),
-                          ([pd.Series([None, 1., 2., 3]), pd.DataFrame({"a": [3., 4., None, None]})],
-                           [pd.Series([1.], index=pd.Int64Index([1])),
-                            pd.DataFrame({"a": [4.]}, index=pd.Int64Index([1]))]),
-                         ])
-def test_drop_nan(data, expected):
-    no_nan_1, no_nan_2 = drop_nan(*data)
-    _check_equality(no_nan_1, expected[0], check_index_type=False)
-    _check_equality(no_nan_2, expected[1], check_index_type=False)

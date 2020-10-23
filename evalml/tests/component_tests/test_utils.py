@@ -60,6 +60,8 @@ def test_scikit_learn_wrapper(X_y_binary, X_y_multi, X_y_regression):
                 num_classes = 3
             elif problem_type == ProblemTypes.REGRESSION:
                 X, y = X_y_regression
+            else:
+                continue
 
             evalml_pipeline = make_pipeline_from_components([estimator()], problem_type)
             scikit_estimator = scikit_learn_wrapped_estimator(evalml_pipeline)

@@ -107,7 +107,7 @@ class ClassificationPipeline(PipelineBase):
             X = pd.DataFrame(X)
 
         X = self.compute_estimator_features(X, y)
-        proba = self.estimator.predict_proba(X, y)
+        proba = self.estimator.predict_proba(X)
         proba.columns = self._encoder.classes_
         return proba
 

@@ -13,3 +13,11 @@ class TimeSeriesProblem:
         self.date_column = date_column
         self.series_id = series_id
         self.unit = unit
+
+    def to_dict(self):
+        return {'max_lag': self.max_lag, 'gap': self.gap,
+                'n_periods_to_predict': self.n_periods_to_predict,
+                'estimator_type': self.estimator_type,
+                'date_column': self.date_column,
+                'series_id': self.series_id,
+                'unit': self.unit}
