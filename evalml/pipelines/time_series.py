@@ -38,8 +38,6 @@ class TimeSeriesRegressionPipeline(RegressionPipeline):
         self.time_series_problem = time_series_problem
 
     def fit(self, X, y):
-        # This shift will introduce nans but PipelineBase._fit will remove them
-        # Need to shift to account for the gap parameter
         if not isinstance(X, pd.DataFrame):
             X = pd.DataFrame(X)
         if not isinstance(y, pd.Series):
@@ -51,10 +49,7 @@ class TimeSeriesRegressionPipeline(RegressionPipeline):
         self.estimator.fit(X_t, y_shifted)
         return self
 
-    # Need to update the API to accept the target variable
-    # So that we can eventually compute lags of the target variable
     def predict(self, X, y=None, objective=None):
-        # Need to drop nans before feeding to the estimator
         features = self.compute_estimator_features(X, y)
         predictions = self.estimator.predict(features.dropna(axis=0, how="any"))
         if features.isna().any(axis=1).any():
@@ -63,7 +58,6 @@ class TimeSeriesRegressionPipeline(RegressionPipeline):
             return predictions
 
     def score(self, X, y, objectives):
-        # Override score to not change ObjectiveBase
         y_shifted = y.shift(-self.time_series_problem.gap)
         objectives = [get_objective(o, return_instance=True) for o in objectives]
         y_predicted = self.predict(X, y)

@@ -120,6 +120,8 @@ def test_all_problem_types():
         ProblemTypes.BINARY,
         ProblemTypes.MULTICLASS,
         ProblemTypes.REGRESSION,
-        ProblemTypes.TIME_SERIES_REGRESSION
+        ProblemTypes.TIME_SERIES_REGRESSION,
+        ProblemTypes.TIME_SERIES_BINARY,
+        ProblemTypes.TIME_SERIES_MULTICLASS
     ]
     assert ProblemTypes.all_problem_types == expected
