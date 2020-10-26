@@ -9,6 +9,14 @@ from evalml.pipelines.time_series import _add_time_series_parameters
 from evalml.problem_types import ProblemTypes, TimeSeriesProblem
 
 
+@pytest.fixture
+def ts_data():
+    X, y = pd.DataFrame({"features": range(101, 132)}), pd.Series(range(1, 32))
+    y.index = pd.date_range("2020-10-01", "2020-10-31")
+    X.index = pd.date_range("2020-10-01", "2020-10-31")
+    return X, y
+
+
 def test_add_time_series_parameters():
     ts = TimeSeriesProblem(gap=2, n_periods_to_predict=2, estimator_type="regression", date_column="date", max_lag=4)
     parameters = {"Lagged Feature Extractor": {}, "One Hot Encoder": {"top_n": 5}}
@@ -48,21 +56,23 @@ def test_time_series_pipeline_init(pipeline_class, components):
 @pytest.mark.parametrize("pipeline_class,estimator_name", [(TimeSeriesRegressionPipeline, "Random Forest Regressor")])
 @patch("evalml.pipelines.components.RandomForestRegressor.fit")
 def test_fit_drop_nans_before_estimator(mock_regressor_fit, pipeline_class,
-                                        estimator_name, gap, max_lag, include_lagged_features):
+                                        estimator_name, gap, max_lag, include_lagged_features, ts_data):
 
-    X, y = pd.DataFrame({"features": range(101, 132)}), pd.Series(range(1, 32))
+    X, y = ts_data
 
     ts = TimeSeriesProblem(gap=gap, n_periods_to_predict=2, estimator_type="regression", date_column="date",
                            max_lag=max_lag)
 
     if include_lagged_features:
         components = ["Lagged Feature Extractor", estimator_name]
-        expected_n_df_rows = 31 - gap - max_lag
+        train_index = pd.date_range(f"2020-10-{1 + max_lag}", f"2020-10-{31-gap}")
         expected_target = np.arange(1 + gap + max_lag, 32)
+        target_index = pd.date_range(f"2020-10-{1 + max_lag}", f"2020-10-{31 - gap}")
     else:
         components = [estimator_name]
-        expected_n_df_rows = 31 - gap
+        train_index = pd.date_range(f"2020-10-01", f"2020-10-{31-gap}")
         expected_target = np.arange(1 + gap, 32)
+        target_index = pd.date_range(f"2020-10-01", f"2020-10-{31-gap}")
 
     class Pipeline(pipeline_class):
         component_graph = components
@@ -72,7 +82,8 @@ def test_fit_drop_nans_before_estimator(mock_regressor_fit, pipeline_class,
     df_passed_to_estimator, target_passed_to_estimator = mock_regressor_fit.call_args[0]
     assert not df_passed_to_estimator.isna().any(axis=1).any()
     assert not target_passed_to_estimator.isna().any()
-    assert df_passed_to_estimator.shape[0] == expected_n_df_rows
+    pd.testing.assert_index_equal(df_passed_to_estimator.index, train_index)
+    pd.testing.assert_index_equal(target_passed_to_estimator.index, target_index)
     np.testing.assert_equal(target_passed_to_estimator.values, expected_target)
 
 
@@ -83,9 +94,9 @@ def test_fit_drop_nans_before_estimator(mock_regressor_fit, pipeline_class,
 @patch("evalml.pipelines.components.RandomForestRegressor.predict")
 def test_predict_pad_nans(mock_regressor_predict, mock_regressor_fit,
                           pipeline_class,
-                          estimator_name, gap, max_lag, include_lagged_features):
-    X, y = pd.DataFrame({"features": range(101, 132)}), pd.Series(range(1, 32))
+                          estimator_name, gap, max_lag, include_lagged_features, ts_data):
 
+    X, y = ts_data
     ts = TimeSeriesProblem(gap=gap, n_periods_to_predict=2, estimator_type="regression", date_column="date",
                            max_lag=max_lag)
 
@@ -119,8 +130,9 @@ def test_predict_pad_nans(mock_regressor_predict, mock_regressor_fit,
 @patch("evalml.pipelines.RegressionPipeline._score_all_objectives")
 def test_score_drops_nans(mock_score, mock_regressor_predict, mock_regressor_fit,
                           pipeline_class,
-                          estimator_name, gap, max_lag, include_lagged_features):
-    X, y = pd.DataFrame({"features": range(101, 132)}), pd.Series(range(1, 32))
+                          estimator_name, gap, max_lag, include_lagged_features, ts_data):
+
+    X, y = ts_data
 
     ts = TimeSeriesProblem(gap=gap, n_periods_to_predict=2, estimator_type="regression", date_column="date",
                            max_lag=max_lag)
@@ -132,12 +144,12 @@ def test_score_drops_nans(mock_score, mock_regressor_predict, mock_regressor_fit
 
     if include_lagged_features:
         components = ["Lagged Feature Extractor", estimator_name]
-        expected_n_df_rows = 31 - gap - max_lag
         expected_target = np.arange(1 + gap + max_lag, 32)
+        target_index = pd.date_range(f"2020-10-{1 + max_lag}", f"2020-10-{31 - gap}")
     else:
         components = [estimator_name]
-        expected_n_df_rows = 31 - gap
         expected_target = np.arange(1 + gap, 32)
+        target_index = pd.date_range(f"2020-10-01", f"2020-10-{31-gap}")
 
     class Pipeline(pipeline_class):
         component_graph = components
@@ -150,5 +162,5 @@ def test_score_drops_nans(mock_score, mock_regressor_predict, mock_regressor_fit
     assert not target.isna().any()
     assert not preds.isna().any()
 
-    assert len(preds) == expected_n_df_rows
+    pd.testing.assert_index_equal(target.index, target_index)
     np.testing.assert_equal(target.values, expected_target)
