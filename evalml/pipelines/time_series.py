@@ -6,7 +6,7 @@ from evalml.objectives import get_objective
 from evalml.pipelines.components.utils import handle_component_class
 from evalml.pipelines.regression_pipeline import RegressionPipeline
 from evalml.problem_types import ProblemTypes
-from evalml.utils.gen_utils import drop_nan, pad_with_nans
+from evalml.utils.gen_utils import any_values_are_nan, drop_nan, pad_with_nans
 
 
 def _add_time_series_parameters(parameters, time_series_problem):
@@ -37,13 +37,19 @@ class TimeSeriesRegressionPipeline(RegressionPipeline):
         super().__init__(updated_params, random_state)
         self.time_series_problem = time_series_problem
 
-    def fit(self, X, y):
+    def fit(self, X, y=None):
+        if y is None:
+            assert isinstance(X, pd.Series), "When modeling a single time series, the data must be a series."
         if not isinstance(X, pd.DataFrame):
             X = pd.DataFrame(X)
-        if not isinstance(y, pd.Series):
-            y = pd.Series(y)
 
-        X_t, _ = self._compute_features_during_fit(X, y)
+        if y is None:
+            X_t, _ = self._compute_features_during_fit(X, y=None)
+            y = X.squeeze()
+        else:
+            y = pd.Series(y)
+            X_t, _ = self._compute_features_during_fit(X, y)
+
         y_shifted = y.shift(-self.time_series_problem.gap)
         X_t, y_shifted = drop_nan(X_t, y_shifted)
         self.estimator.fit(X_t, y_shifted)
@@ -52,15 +58,17 @@ class TimeSeriesRegressionPipeline(RegressionPipeline):
     def predict(self, X, y=None, objective=None):
         features = self.compute_estimator_features(X, y)
         predictions = self.estimator.predict(features.dropna(axis=0, how="any"))
-        if features.isna().any(axis=1).any():
+        if any_values_are_nan(features):
             return pad_with_nans(predictions, self.time_series_problem.max_lag)
         else:
             return predictions
 
     def score(self, X, y, objectives):
+        y_predicted = self.predict(X, y)
+        if y is None:
+            y = X.copy()
         y_shifted = y.shift(-self.time_series_problem.gap)
         objectives = [get_objective(o, return_instance=True) for o in objectives]
-        y_predicted = self.predict(X, y)
         y_shifted, y_predicted = drop_nan(y_shifted, y_predicted)
         return self._score_all_objectives(X, y_shifted,
                                           y_predicted,

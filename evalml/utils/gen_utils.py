@@ -315,3 +315,7 @@ def drop_nan(pd_data_1, pd_data_2):
 
     mask = np.logical_and(_not_nan(pd_data_1), _not_nan(pd_data_2))
     return pd_data_1.iloc[mask], pd_data_2.iloc[mask]
+
+
+def any_values_are_nan(pd_data):
+    return pd_data.isna().values.any()

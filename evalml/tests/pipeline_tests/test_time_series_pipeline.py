@@ -51,12 +51,13 @@ def test_time_series_pipeline_init(pipeline_class, components):
                                                              "max_lag": 5}
 
 
+@pytest.mark.parametrize("only_use_y", [True, False])
 @pytest.mark.parametrize("include_lagged_features", [True, False])
 @pytest.mark.parametrize("gap,max_lag", [(1, 2), (2, 2), (7, 3), (2, 4)])
 @pytest.mark.parametrize("pipeline_class,estimator_name", [(TimeSeriesRegressionPipeline, "Random Forest Regressor")])
 @patch("evalml.pipelines.components.RandomForestRegressor.fit")
 def test_fit_drop_nans_before_estimator(mock_regressor_fit, pipeline_class,
-                                        estimator_name, gap, max_lag, include_lagged_features, ts_data):
+                                        estimator_name, gap, max_lag, include_lagged_features, only_use_y, ts_data):
 
     X, y = ts_data
 
@@ -67,26 +68,35 @@ def test_fit_drop_nans_before_estimator(mock_regressor_fit, pipeline_class,
         components = ["Lagged Feature Extractor", estimator_name]
         train_index = pd.date_range(f"2020-10-{1 + max_lag}", f"2020-10-{31-gap}")
         expected_target = np.arange(1 + gap + max_lag, 32)
-        target_index = pd.date_range(f"2020-10-{1 + max_lag}", f"2020-10-{31 - gap}")
     else:
         components = [estimator_name]
         train_index = pd.date_range(f"2020-10-01", f"2020-10-{31-gap}")
         expected_target = np.arange(1 + gap, 32)
-        target_index = pd.date_range(f"2020-10-01", f"2020-10-{31-gap}")
+
+    expected_n_features = {(True, True): max_lag + 1,
+                           (True, False): 1,
+                           (False, True): 2 * (max_lag + 1),
+                           (False, False): 1}[(only_use_y, include_lagged_features)]
 
     class Pipeline(pipeline_class):
         component_graph = components
 
     pl = Pipeline({}, ts)
-    pl.fit(X, y)
+
+    if only_use_y:
+        pl.fit(y)
+    else:
+        pl.fit(X, y)
+
     df_passed_to_estimator, target_passed_to_estimator = mock_regressor_fit.call_args[0]
     assert not df_passed_to_estimator.isna().any(axis=1).any()
+    assert df_passed_to_estimator.shape[1] == expected_n_features
     assert not target_passed_to_estimator.isna().any()
     pd.testing.assert_index_equal(df_passed_to_estimator.index, train_index)
-    pd.testing.assert_index_equal(target_passed_to_estimator.index, target_index)
     np.testing.assert_equal(target_passed_to_estimator.values, expected_target)
 
 
+@pytest.mark.parametrize("only_use_y", [True, False])
 @pytest.mark.parametrize("include_lagged_features", [True, False])
 @pytest.mark.parametrize("gap,max_lag", [(1, 2), (2, 2), (7, 3), (2, 4)])
 @pytest.mark.parametrize("pipeline_class,estimator_name", [(TimeSeriesRegressionPipeline, "Random Forest Regressor")])
@@ -94,7 +104,7 @@ def test_fit_drop_nans_before_estimator(mock_regressor_fit, pipeline_class,
 @patch("evalml.pipelines.components.RandomForestRegressor.predict")
 def test_predict_pad_nans(mock_regressor_predict, mock_regressor_fit,
                           pipeline_class,
-                          estimator_name, gap, max_lag, include_lagged_features, ts_data):
+                          estimator_name, gap, max_lag, include_lagged_features, only_use_y, ts_data):
 
     X, y = ts_data
     ts = TimeSeriesProblem(gap=gap, n_periods_to_predict=2, estimator_type="regression", date_column="date",
@@ -114,14 +124,21 @@ def test_predict_pad_nans(mock_regressor_predict, mock_regressor_fit,
         component_graph = components
 
     pl = Pipeline({}, ts)
-    pl.fit(X, y)
-    preds = pl.predict(X, y)
+
+    if only_use_y:
+        pl.fit(y)
+        preds = pl.predict(y)
+    else:
+        pl.fit(X, y)
+        preds = pl.predict(X, y)
+
     if include_lagged_features:
         assert np.isnan(preds.values[:max_lag]).all()
     else:
         assert not np.isnan(preds.values).any()
 
 
+@pytest.mark.parametrize("only_use_y", [True, False])
 @pytest.mark.parametrize("include_lagged_features", [True, False])
 @pytest.mark.parametrize("gap,max_lag", [(1, 2), (2, 2), (7, 3), (2, 4)])
 @pytest.mark.parametrize("pipeline_class,estimator_name", [(TimeSeriesRegressionPipeline, "Random Forest Regressor")])
@@ -130,7 +147,7 @@ def test_predict_pad_nans(mock_regressor_predict, mock_regressor_fit,
 @patch("evalml.pipelines.RegressionPipeline._score_all_objectives")
 def test_score_drops_nans(mock_score, mock_regressor_predict, mock_regressor_fit,
                           pipeline_class,
-                          estimator_name, gap, max_lag, include_lagged_features, ts_data):
+                          estimator_name, gap, max_lag, include_lagged_features, only_use_y, ts_data):
 
     X, y = ts_data
 
@@ -155,9 +172,14 @@ def test_score_drops_nans(mock_score, mock_regressor_predict, mock_regressor_fit
         component_graph = components
 
     pl = Pipeline({}, ts)
-    pl.fit(X, y)
 
-    pl.score(X, y, objectives=[])
+    if only_use_y:
+        pl.fit(y)
+        pl.score(y, y=None, objectives=[])
+    else:
+        pl.fit(X, y)
+        pl.score(X, y, objectives=[])
+
     _, target, preds = mock_score.call_args[0]
     assert not target.isna().any()
     assert not preds.isna().any()
