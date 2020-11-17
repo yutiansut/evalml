@@ -5,8 +5,13 @@ import pytest
 
 from evalml.automl.pipeline_search_plots import SearchIterationPlot
 
+import time
+from evalml.utils.logger import get_logger
+logger = get_logger(__file__)
+
 
 def test_search_iteration_plot_class():
+    logger.info(f'at time: {time.time()}, in test: test_search_iteration_plot_class()')
     pytest.importorskip('plotly.graph_objects', reason='Skipping plotting test because plotly not installed')
 
     class MockObjective:
@@ -60,6 +65,7 @@ def test_search_iteration_plot_class():
 @patch('evalml.automl.pipeline_search_plots.jupyter_check')
 @patch('evalml.automl.pipeline_search_plots.import_or_raise')
 def test_jupyter(import_check, jupyter_check):
+    logger.info(f'at time: {time.time()}, in test: test_jupyter()')
     mock_data = MagicMock()
 
     pytest.importorskip('plotly.graph_objects', reason='Skipping plotting test because plotly not installed')

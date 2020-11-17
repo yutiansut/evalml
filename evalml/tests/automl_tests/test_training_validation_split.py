@@ -4,12 +4,18 @@ import pytest
 
 from evalml.automl import TrainingValidationSplit
 
+import time
+from evalml.utils.logger import get_logger
+logger = get_logger(__file__)
+
 
 def test_tvsplit_nsplits():
+    logger.info(f'at time: {time.time()}, in test: test_tvsplit_nsplits()')
     assert TrainingValidationSplit().get_n_splits() == 1
 
 
 def test_tvsplit_default():
+    logger.info(f'at time: {time.time()}, in test: test_tvsplit_default()')
     X = pd.DataFrame({'col1': np.arange(0, 10)})
     y = pd.Series(np.arange(100, 110), name='target')
     splitter = TrainingValidationSplit()
@@ -21,6 +27,7 @@ def test_tvsplit_default():
 
 
 def test_tvsplit_size():
+    logger.info(f'at time: {time.time()}, in test: test_tvsplit_size()')
     X = pd.DataFrame({'col1': np.arange(0, 10)})
     y = pd.Series(np.arange(100, 110), name='target')
     splitter = TrainingValidationSplit(test_size=0.2, train_size=0.3)
@@ -37,6 +44,7 @@ def test_tvsplit_size():
 
 
 def test_tvsplit_shuffle():
+    logger.info(f'at time: {time.time()}, in test: test_tvsplit_shuffle()')
     X = pd.DataFrame({'col1': np.arange(0, 10)})
     y = pd.Series(np.arange(100, 110), name='target')
     splitter = TrainingValidationSplit(shuffle=True, random_state=0)
@@ -47,6 +55,7 @@ def test_tvsplit_shuffle():
 
 
 def test_tvsplit_stratify():
+    logger.info(f'at time: {time.time()}, in test: test_tvsplit_stratify()')
     X = pd.DataFrame({'col1': np.arange(0, 10)})
     y = pd.Series(np.arange(5).repeat(2), name='target')
     splitter = TrainingValidationSplit(train_size=5, test_size=5, shuffle=True, stratify=y, random_state=0)
@@ -58,6 +67,7 @@ def test_tvsplit_stratify():
 
 @pytest.mark.parametrize("random_state", [0, 11, 57, 99, 1000])
 def test_tvsplit_always_within_bounds_with_custom_index(random_state):
+    logger.info(f'at time: {time.time()}, in test: test_tvsplit_always_within_bounds_with_custom_index()')
     N = 11000
     X = pd.DataFrame({'col1': np.arange(0, N)}, index=np.arange(20000, 20000 + N))
     splitter = TrainingValidationSplit(train_size=0.75, shuffle=True, random_state=random_state)

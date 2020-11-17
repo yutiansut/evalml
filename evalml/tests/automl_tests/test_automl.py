@@ -54,9 +54,14 @@ from evalml.utils.gen_utils import (
     numeric_and_boolean_dtypes
 )
 
+import time
+from evalml.utils.logger import get_logger
+logger = get_logger(__file__)
+
 
 @pytest.mark.parametrize("automl_type", [ProblemTypes.REGRESSION, ProblemTypes.BINARY, ProblemTypes.MULTICLASS])
 def test_search_results(X_y_regression, X_y_binary, X_y_multi, automl_type):
+    logger.info(f'at time: {time.time()}, in test: test_search_results()')
     expected_cv_data_keys = {'all_objective_scores', 'score', 'binary_classification_threshold'}
     automl = AutoMLSearch(problem_type=automl_type, max_iterations=2)
     if automl_type == ProblemTypes.REGRESSION:
@@ -118,6 +123,7 @@ def test_pipeline_limits(mock_fit_binary, mock_score_binary,
                          mock_fit_regression, mock_score_regression,
                          automl_type, caplog,
                          X_y_binary, X_y_multi, X_y_regression):
+    logger.info(f'at time: {time.time()}, in test: test_pipeline_limits()')
     if automl_type == ProblemTypes.BINARY:
         X, y = X_y_binary
     elif automl_type == ProblemTypes.MULTICLASS:
@@ -168,6 +174,7 @@ def test_pipeline_limits(mock_fit_binary, mock_score_binary,
 
 @patch('evalml.pipelines.BinaryClassificationPipeline.fit')
 def test_pipeline_fit_raises(mock_fit, X_y_binary, caplog):
+    logger.info(f'at time: {time.time()}, in test: test_pipeline_fit_raises()')
     msg = 'all your model are belong to us'
     mock_fit.side_effect = Exception(msg)
     X, y = X_y_binary
@@ -190,6 +197,7 @@ def test_pipeline_fit_raises(mock_fit, X_y_binary, caplog):
 
 @patch('evalml.pipelines.BinaryClassificationPipeline.score')
 def test_pipeline_score_raises(mock_score, X_y_binary, caplog):
+    logger.info(f'at time: {time.time()}, in test: test_pipeline_score_raises()')
     msg = 'all your model are belong to us'
     mock_score.side_effect = Exception(msg)
     X, y = X_y_binary
@@ -209,6 +217,7 @@ def test_pipeline_score_raises(mock_score, X_y_binary, caplog):
 
 @patch('evalml.objectives.AUC.score')
 def test_objective_score_raises(mock_score, X_y_binary, caplog):
+    logger.info(f'at time: {time.time()}, in test: test_objective_score_raises()')
     msg = 'all your model are belong to us'
     mock_score.side_effect = Exception(msg)
     X, y = X_y_binary
@@ -228,6 +237,7 @@ def test_objective_score_raises(mock_score, X_y_binary, caplog):
 
 
 def test_rankings(X_y_binary, X_y_regression):
+    logger.info(f'at time: {time.time()}, in test: test_rankings()')
     X, y = X_y_binary
     model_families = ['random_forest']
     automl = AutoMLSearch(problem_type='binary', allowed_model_families=model_families, max_iterations=3)
@@ -247,6 +257,7 @@ def test_rankings(X_y_binary, X_y_regression):
 @patch('evalml.pipelines.BinaryClassificationPipeline.score')
 @patch('evalml.pipelines.BinaryClassificationPipeline.fit')
 def test_automl_str_search(mock_fit, mock_score, mock_predict_proba, mock_optimize_threshold, X_y_binary):
+    logger.info(f'at time: {time.time()}, in test: test_automl_str_search()')
     def _dummy_callback(param1, param2, param3):
         return None
 
@@ -311,6 +322,7 @@ def test_automl_str_search(mock_fit, mock_score, mock_predict_proba, mock_optimi
 
 
 def test_automl_data_check_results_is_none_before_search():
+    logger.info(f'at time: {time.time()}, in test: test_automl_data_check_results_is_none_before_search()')
     automl = AutoMLSearch(problem_type='binary', max_iterations=1)
     assert automl.data_check_results is None
 
@@ -318,6 +330,7 @@ def test_automl_data_check_results_is_none_before_search():
 @patch('evalml.pipelines.BinaryClassificationPipeline.score')
 @patch('evalml.pipelines.BinaryClassificationPipeline.fit')
 def test_automl_empty_data_checks(mock_fit, mock_score):
+    logger.info(f'at time: {time.time()}, in test: test_automl_empty_data_checks()')
     X = pd.DataFrame({"feature1": [1, 2, 3],
                       "feature2": [None, None, None]})
     y = pd.Series([1, 1, 1])
@@ -342,6 +355,7 @@ def test_automl_empty_data_checks(mock_fit, mock_score):
 @patch('evalml.pipelines.BinaryClassificationPipeline.score')
 @patch('evalml.pipelines.BinaryClassificationPipeline.fit')
 def test_automl_default_data_checks(mock_fit, mock_score, mock_validate, X_y_binary, caplog):
+    logger.info(f'at time: {time.time()}, in test: test_automl_default_data_checks()')
     X, y = X_y_binary
     mock_score.return_value = {'Log Loss Binary': 1.0}
     mock_validate.return_value = [DataCheckWarning("default data check warning", "DefaultDataChecks")]
@@ -366,6 +380,7 @@ class MockDataCheckErrorAndWarning(DataCheck):
 @patch('evalml.pipelines.BinaryClassificationPipeline.score')
 @patch('evalml.pipelines.BinaryClassificationPipeline.fit')
 def test_automl_data_checks_raises_error(mock_fit, mock_score, data_checks, caplog):
+    logger.info(f'at time: {time.time()}, in test: test_automl_data_checks_raises_error()')
     X = pd.DataFrame()
     y = pd.Series()
 
@@ -381,6 +396,7 @@ def test_automl_data_checks_raises_error(mock_fit, mock_score, data_checks, capl
 
 
 def test_automl_bad_data_check_parameter_type():
+    logger.info(f'at time: {time.time()}, in test: test_automl_bad_data_check_parameter_type()')
     X = pd.DataFrame()
     y = pd.Series()
 
@@ -400,6 +416,7 @@ def test_automl_bad_data_check_parameter_type():
 
 
 def test_automl_str_no_param_search():
+    logger.info(f'at time: {time.time()}, in test: test_automl_str_no_param_search()')
     automl = AutoMLSearch(problem_type='binary')
 
     param_str_reps = {
@@ -438,6 +455,7 @@ def test_automl_str_no_param_search():
 @patch('evalml.pipelines.BinaryClassificationPipeline.score')
 @patch('evalml.pipelines.BinaryClassificationPipeline.fit')
 def test_automl_feature_selection(mock_fit, mock_score, X_y_binary):
+    logger.info(f'at time: {time.time()}, in test: test_automl_feature_selection()')
     X, y = X_y_binary
     mock_score.return_value = {'Log Loss Binary': 1.0}
 
@@ -462,6 +480,7 @@ def test_automl_feature_selection(mock_fit, mock_score, X_y_binary):
 @patch('evalml.pipelines.BinaryClassificationPipeline.score')
 @patch('evalml.pipelines.BinaryClassificationPipeline.fit')
 def test_automl_tuner_exception(mock_fit, mock_score, mock_is_search_space_exhausted, X_y_binary):
+    logger.info(f'at time: {time.time()}, in test: test_automl_tuner_exception()')
     mock_score.return_value = {'Log Loss Binary': 1.0}
     X, y = X_y_binary
     error_text = "Cannot create a unique set of unexplored parameters. Try expanding the search space."
@@ -475,6 +494,7 @@ def test_automl_tuner_exception(mock_fit, mock_score, mock_is_search_space_exhau
 @patch('evalml.pipelines.BinaryClassificationPipeline.score')
 @patch('evalml.pipelines.BinaryClassificationPipeline.fit')
 def test_automl_algorithm(mock_fit, mock_score, mock_algo_next_batch, X_y_binary):
+    logger.info(f'at time: {time.time()}, in test: test_automl_algorithm()')
     X, y = X_y_binary
     mock_score.return_value = {'Log Loss Binary': 1.0}
     mock_algo_next_batch.side_effect = StopIteration("that's all, folks")
@@ -491,6 +511,7 @@ def test_automl_algorithm(mock_fit, mock_score, mock_algo_next_batch, X_y_binary
 
 @patch('evalml.automl.automl_algorithm.IterativeAlgorithm.__init__')
 def test_automl_allowed_pipelines_algorithm(mock_algo_init, dummy_binary_pipeline_class, X_y_binary):
+    logger.info(f'at time: {time.time()}, in test: test_automl_allowed_pipelines_algorithm()')
     mock_algo_init.side_effect = Exception('mock algo init')
     X, y = X_y_binary
 
@@ -515,6 +536,7 @@ def test_automl_allowed_pipelines_algorithm(mock_algo_init, dummy_binary_pipelin
 
 
 def test_automl_serialization(X_y_binary, tmpdir):
+    logger.info(f'at time: {time.time()}, in test: test_automl_serialization()')
     X, y = X_y_binary
     path = os.path.join(str(tmpdir), 'automl.pkl')
     num_max_iterations = 5
@@ -544,6 +566,7 @@ def test_automl_serialization(X_y_binary, tmpdir):
 
 @patch('cloudpickle.dump')
 def test_automl_serialization_protocol(mock_cloudpickle_dump, tmpdir):
+    logger.info(f'at time: {time.time()}, in test: test_automl_serialization_protocol()')
     path = os.path.join(str(tmpdir), 'automl.pkl')
     automl = AutoMLSearch(problem_type='binary', max_iterations=5)
 
@@ -558,6 +581,7 @@ def test_automl_serialization_protocol(mock_cloudpickle_dump, tmpdir):
 
 
 def test_invalid_data_splitter():
+    logger.info(f'at time: {time.time()}, in test: test_invalid_data_splitter()')
     data_splitter = pd.DataFrame()
     with pytest.raises(ValueError, match='Not a valid data splitter'):
         AutoMLSearch(problem_type='binary', data_split=data_splitter)
@@ -565,6 +589,7 @@ def test_invalid_data_splitter():
 
 @patch('evalml.pipelines.BinaryClassificationPipeline.score')
 def test_large_dataset_binary(mock_score):
+    logger.info(f'at time: {time.time()}, in test: test_large_dataset_binary()')
     X = pd.DataFrame({'col_0': [i for i in range(101000)]})
     y = pd.Series([i % 2 for i in range(101000)])
 
@@ -589,6 +614,7 @@ def test_large_dataset_binary(mock_score):
 
 @patch('evalml.pipelines.MulticlassClassificationPipeline.score')
 def test_large_dataset_multiclass(mock_score):
+    logger.info(f'at time: {time.time()}, in test: test_large_dataset_multiclass()')
     X = pd.DataFrame({'col_0': [i for i in range(101000)]})
     y = pd.Series([i % 4 for i in range(101000)])
 
@@ -607,6 +633,7 @@ def test_large_dataset_multiclass(mock_score):
 
 @patch('evalml.pipelines.RegressionPipeline.score')
 def test_large_dataset_regression(mock_score):
+    logger.info(f'at time: {time.time()}, in test: test_large_dataset_regression()')
     X = pd.DataFrame({'col_0': [i for i in range(101000)]})
     y = pd.Series([i for i in range(101000)])
 
@@ -626,6 +653,7 @@ def test_large_dataset_regression(mock_score):
 @patch('evalml.pipelines.BinaryClassificationPipeline.fit')
 @patch('evalml.pipelines.BinaryClassificationPipeline.score')
 def test_large_dataset_split_size(mock_fit, mock_score):
+    logger.info(f'at time: {time.time()}, in test: test_large_dataset_split_size()')
     def generate_fake_dataset(rows):
         X = pd.DataFrame({'col_0': [i for i in range(rows)]})
         y = pd.Series([i % 2 for i in range(rows)])
@@ -656,6 +684,7 @@ def test_large_dataset_split_size(mock_fit, mock_score):
 
 
 def test_data_split_shuffle():
+    logger.info(f'at time: {time.time()}, in test: test_data_split_shuffle()')
     # this test checks that the default data split strategy should shuffle data. it creates a target which
     # increases monotonically from 0 to n-1.
     #
@@ -682,6 +711,7 @@ def test_data_split_shuffle():
 
 
 def test_allowed_pipelines_with_incorrect_problem_type(dummy_binary_pipeline_class):
+    logger.info(f'at time: {time.time()}, in test: test_allowed_pipelines_with_incorrect_problem_type()')
     # checks that not setting allowed_pipelines does not error out
     AutoMLSearch(problem_type='binary')
 
@@ -690,11 +720,13 @@ def test_allowed_pipelines_with_incorrect_problem_type(dummy_binary_pipeline_cla
 
 
 def test_main_objective_problem_type_mismatch():
+    logger.info(f'at time: {time.time()}, in test: test_main_objective_problem_type_mismatch()')
     with pytest.raises(ValueError, match="is not compatible with a"):
         AutoMLSearch(problem_type='binary', objective='R2')
 
 
 def test_init_problem_type_error():
+    logger.info(f'at time: {time.time()}, in test: test_init_problem_type_error()')
     with pytest.raises(ValueError, match=r"choose one of \(binary, multiclass, regression\) as problem_type"):
         AutoMLSearch()
 
@@ -703,6 +735,7 @@ def test_init_problem_type_error():
 
 
 def test_init_objective():
+    logger.info(f'at time: {time.time()}, in test: test_init_objective()')
     defaults = {'multiclass': 'Log Loss Multiclass', 'binary': 'Log Loss Binary', 'regression': 'R2'}
     for problem_type in defaults:
         error_automl = AutoMLSearch(problem_type=problem_type)
@@ -711,6 +744,7 @@ def test_init_objective():
 
 @patch('evalml.automl.automl_search.AutoMLSearch.search')
 def test_checks_at_search_time(mock_search, dummy_regression_pipeline_class, X_y_multi):
+    logger.info(f'at time: {time.time()}, in test: test_checks_at_search_time()')
     X, y = X_y_multi
 
     error_text = "in search, problem_type mismatches label type."
@@ -722,11 +756,13 @@ def test_checks_at_search_time(mock_search, dummy_regression_pipeline_class, X_y
 
 
 def test_incompatible_additional_objectives():
+    logger.info(f'at time: {time.time()}, in test: test_incompatible_additional_objectives()')
     with pytest.raises(ValueError, match="is not compatible with a "):
         AutoMLSearch(problem_type='multiclass', additional_objectives=['Precision', 'AUC'])
 
 
 def test_default_objective():
+    logger.info(f'at time: {time.time()}, in test: test_default_objective()')
     correct_matches = {ProblemTypes.MULTICLASS: 'Log Loss Multiclass',
                        ProblemTypes.BINARY: 'Log Loss Binary',
                        ProblemTypes.REGRESSION: 'R2'}
@@ -741,6 +777,7 @@ def test_default_objective():
 @patch('evalml.pipelines.BinaryClassificationPipeline.score')
 @patch('evalml.pipelines.BinaryClassificationPipeline.fit')
 def test_add_to_rankings(mock_fit, mock_score, dummy_binary_pipeline_class, X_y_binary):
+    logger.info(f'at time: {time.time()}, in test: test_add_to_rankings()')
     X, y = X_y_binary
     mock_score.return_value = {'Log Loss Binary': 1.0}
 
@@ -759,6 +796,7 @@ def test_add_to_rankings(mock_fit, mock_score, dummy_binary_pipeline_class, X_y_
 @patch('evalml.pipelines.BinaryClassificationPipeline.score')
 @patch('evalml.pipelines.BinaryClassificationPipeline.fit')
 def test_add_to_rankings_no_search(mock_fit, mock_score, dummy_binary_pipeline_class, X_y_binary):
+    logger.info(f'at time: {time.time()}, in test: test_add_to_rankings_no_search()')
     X, y = X_y_binary
     automl = AutoMLSearch(problem_type='binary', max_iterations=1)
 
@@ -778,6 +816,7 @@ def test_add_to_rankings_no_search(mock_fit, mock_score, dummy_binary_pipeline_c
 
 @patch('evalml.pipelines.RegressionPipeline.score')
 def test_add_to_rankings_regression_large(mock_score, dummy_regression_pipeline_class):
+    logger.info(f'at time: {time.time()}, in test: test_add_to_rankings_regression_large()')
     X = pd.DataFrame({'col_0': [i for i in range(101000)]})
     y = pd.Series([i for i in range(101000)])
 
@@ -794,6 +833,7 @@ def test_add_to_rankings_regression_large(mock_score, dummy_regression_pipeline_
 
 @patch('evalml.pipelines.RegressionPipeline.score')
 def test_add_to_rankings_regression(mock_score, dummy_regression_pipeline_class, X_y_regression):
+    logger.info(f'at time: {time.time()}, in test: test_add_to_rankings_regression()')
     X, y = X_y_regression
 
     automl = AutoMLSearch(problem_type='regression', max_time=1, max_iterations=1)
@@ -810,6 +850,7 @@ def test_add_to_rankings_regression(mock_score, dummy_regression_pipeline_class,
 @patch('evalml.pipelines.BinaryClassificationPipeline.score')
 @patch('evalml.pipelines.BinaryClassificationPipeline.fit')
 def test_add_to_rankings_duplicate(mock_fit, mock_score, dummy_binary_pipeline_class, X_y_binary):
+    logger.info(f'at time: {time.time()}, in test: test_add_to_rankings_duplicate()')
     X, y = X_y_binary
     mock_score.return_value = {'Log Loss Binary': 0.1234}
 
@@ -826,6 +867,7 @@ def test_add_to_rankings_duplicate(mock_fit, mock_score, dummy_binary_pipeline_c
 @patch('evalml.pipelines.BinaryClassificationPipeline.score')
 @patch('evalml.pipelines.BinaryClassificationPipeline.fit')
 def test_add_to_rankings_trained(mock_fit, mock_score, dummy_binary_pipeline_class, X_y_binary):
+    logger.info(f'at time: {time.time()}, in test: test_add_to_rankings_trained()')
     X, y = X_y_binary
     mock_score.return_value = {'Log Loss Binary': 1.0}
 
@@ -849,6 +891,7 @@ def test_add_to_rankings_trained(mock_fit, mock_score, dummy_binary_pipeline_cla
 @patch('evalml.pipelines.BinaryClassificationPipeline.score')
 @patch('evalml.pipelines.BinaryClassificationPipeline.fit')
 def test_has_searched(mock_fit, mock_score, dummy_binary_pipeline_class, X_y_binary):
+    logger.info(f'at time: {time.time()}, in test: test_has_searched()')
     X, y = X_y_binary
 
     automl = AutoMLSearch(problem_type='binary', max_iterations=1)
@@ -860,6 +903,7 @@ def test_has_searched(mock_fit, mock_score, dummy_binary_pipeline_class, X_y_bin
 
 
 def test_no_search():
+    logger.info(f'at time: {time.time()}, in test: test_no_search()')
     automl = AutoMLSearch(problem_type='binary')
     assert isinstance(automl.rankings, pd.DataFrame)
     assert isinstance(automl.full_rankings, pd.DataFrame)
@@ -884,6 +928,7 @@ def test_no_search():
 @patch('evalml.pipelines.BinaryClassificationPipeline.score')
 @patch('evalml.pipelines.BinaryClassificationPipeline.fit')
 def test_get_pipeline_invalid(mock_fit, mock_score, X_y_binary):
+    logger.info(f'at time: {time.time()}, in test: test_get_pipeline_invalid()')
     X, y = X_y_binary
     mock_score.return_value = {'Log Loss Binary': 1.0}
 
@@ -909,6 +954,7 @@ def test_get_pipeline_invalid(mock_fit, mock_score, X_y_binary):
 @patch('evalml.pipelines.BinaryClassificationPipeline.score')
 @patch('evalml.pipelines.BinaryClassificationPipeline.fit')
 def test_describe_pipeline(mock_fit, mock_score, caplog, X_y_binary):
+    logger.info(f'at time: {time.time()}, in test: test_describe_pipeline()')
     X, y = X_y_binary
     mock_score.return_value = {'Log Loss Binary': 1.0}
 
@@ -938,7 +984,12 @@ def test_describe_pipeline(mock_fit, mock_score, caplog, X_y_binary):
 
 @patch('evalml.pipelines.BinaryClassificationPipeline.score')
 @patch('evalml.pipelines.BinaryClassificationPipeline.fit')
+<<<<<<< Updated upstream
 def test_results_getter(mock_fit, mock_score, X_y_binary):
+=======
+def test_results_getter(mock_fit, mock_score, caplog, X_y_binary):
+    logger.info(f'at time: {time.time()}, in test: test_results_getter()')
+>>>>>>> Stashed changes
     X, y = X_y_binary
     automl = AutoMLSearch(problem_type='binary', max_iterations=1)
 
@@ -962,6 +1013,7 @@ def test_results_getter(mock_fit, mock_score, X_y_binary):
 @pytest.mark.parametrize("automl_type", [ProblemTypes.BINARY, ProblemTypes.MULTICLASS])
 @pytest.mark.parametrize("target_type", numeric_and_boolean_dtypes + categorical_dtypes + ['Int64', 'boolean'])
 def test_targets_data_types_classification(data_type, automl_type, target_type):
+    logger.info(f'at time: {time.time()}, in test: test_targets_data_types_classification()')
     if data_type == 'np' and target_type not in numeric_and_boolean_dtypes + categorical_dtypes:
         pytest.skip("Skipping test where data type is numpy and target type is nullable dtype")
 
@@ -1055,6 +1107,7 @@ dont_interrupt_after_bad_message = ["Yes", "yes.", "n"]
 def test_catch_keyboard_interrupt(mock_fit, mock_score, mock_input,
                                   when_to_interrupt, user_input, number_results,
                                   X_y_binary):
+    logger.info(f'at time: {time.time()}, in test: test_catch_keyboard_interrupt()')
 
     mock_input.side_effect = user_input
     X, y = X_y_binary
@@ -1068,6 +1121,7 @@ def test_catch_keyboard_interrupt(mock_fit, mock_score, mock_input,
 @patch('evalml.automl.automl_algorithm.IterativeAlgorithm.next_batch')
 @patch('evalml.automl.AutoMLSearch._evaluate')
 def test_pipelines_in_batch_return_nan(mock_evaluate, mock_next_batch, X_y_binary, dummy_binary_pipeline_class):
+    logger.info(f'at time: {time.time()}, in test: test_pipelines_in_batch_return_nan()')
     X, y = X_y_binary
     mock_evaluate.side_effect = [{'cv_score_mean': 0}, {'cv_score_mean': np.nan}]
     mock_next_batch.side_effect = [[dummy_binary_pipeline_class(parameters={}), dummy_binary_pipeline_class(parameters={})]]
@@ -1088,6 +1142,7 @@ def test_pipelines_in_batch_return_nan(mock_evaluate, mock_next_batch, X_y_binar
 @patch('evalml.automl.automl_algorithm.IterativeAlgorithm.next_batch')
 @patch('evalml.automl.AutoMLSearch._evaluate')
 def test_pipelines_in_batch_return_none(mock_evaluate, mock_next_batch, X_y_binary, dummy_binary_pipeline_class):
+    logger.info(f'at time: {time.time()}, in test: test_pipelines_in_batch_return_none()')
     X, y = X_y_binary
     mock_evaluate.side_effect = [{'cv_score_mean': 0}, {'cv_score_mean': 0},  # first batch
                                  {'cv_score_mean': 0}, {'cv_score_mean': np.nan},  # second batch
@@ -1102,6 +1157,7 @@ def test_pipelines_in_batch_return_none(mock_evaluate, mock_next_batch, X_y_bina
 @patch('evalml.pipelines.BinaryClassificationPipeline.score')
 @patch('evalml.pipelines.BinaryClassificationPipeline.fit')
 def test_error_during_train_test_split(mock_fit, mock_score, mock_train_test_split, X_y_binary):
+    logger.info(f'at time: {time.time()}, in test: test_error_during_train_test_split()')
     X, y = X_y_binary
     mock_score.return_value = {'Log Loss Binary': 1.0}
     mock_train_test_split.side_effect = RuntimeError()
@@ -1123,6 +1179,7 @@ def test_percent_better_than_baseline_in_rankings(objective, pipeline_scores, ba
                                                   dummy_binary_pipeline_class, dummy_multiclass_pipeline_class,
                                                   dummy_regression_pipeline_class,
                                                   X_y_binary):
+    logger.info(f'at time: {time.time()}, in test: test_percent_better_than_baseline_in_rankings()')
 
     if not objective.is_defined_for_problem_type(problem_type_value):
         pytest.skip("Skipping because objective is not defined for problem type")
@@ -1187,6 +1244,7 @@ def test_percent_better_than_baseline_computed_for_all_objectives(mock_baseline_
                                                                   dummy_multiclass_pipeline_class,
                                                                   dummy_regression_pipeline_class,
                                                                   X_y_binary):
+    logger.info(f'at time: {time.time()}, in test: test_percent_better_than_baseline_computed_for_all_objectives()')
 
     X, y = X_y_binary
 
@@ -1237,6 +1295,7 @@ def test_percent_better_than_baseline_scores_different_folds(mock_fit,
                                                              fold_scores,
                                                              dummy_binary_pipeline_class,
                                                              X_y_binary):
+    logger.info(f'at time: {time.time()}, in test: test_percent_better_than_baseline_scores_different_folds()')
 
     # Test that percent-better-than-baseline is correctly computed when scores differ across folds
     X, y = X_y_binary
@@ -1275,6 +1334,7 @@ def _get_first_stacked_classifier_no(model_families=None):
 @patch('evalml.pipelines.BinaryClassificationPipeline.score', return_value={"Log Loss Binary": 0.8})
 @patch('evalml.pipelines.BinaryClassificationPipeline.fit')
 def test_max_iteration_works_with_stacked_ensemble(mock_pipeline_fit, mock_score, max_iterations, use_ensembling, X_y_binary):
+    logger.info(f'at time: {time.time()}, in test: test_max_iteration_works_with_stacked_ensemble()')
     X, y = X_y_binary
 
     automl = AutoMLSearch(problem_type="binary", max_iterations=max_iterations, objective="Log Loss Binary", ensembling=use_ensembling)
@@ -1301,6 +1361,7 @@ def test_max_iteration_works_with_stacked_ensemble(mock_pipeline_fit, mock_score
 @patch('evalml.pipelines.BinaryClassificationPipeline.fit')
 def test_max_batches_works(mock_pipeline_fit, mock_score, mock_regression_fit, mock_regression_score,
                            max_batches, use_ensembling, problem_type, X_y_binary, X_y_regression):
+    logger.info(f'at time: {time.time()}, in test: test_max_batches_works()')
     if problem_type == ProblemTypes.BINARY:
         X, y = X_y_binary
         automl = AutoMLSearch(problem_type="binary", max_iterations=None,
@@ -1372,6 +1433,7 @@ def test_automl_one_allowed_pipeline_ensembling_disabled(mock_pipeline_fit, mock
 @patch('evalml.pipelines.BinaryClassificationPipeline.score', return_value={"Log Loss Binary": 0.8})
 @patch('evalml.pipelines.BinaryClassificationPipeline.fit')
 def test_max_batches_output(mock_pipeline_fit, mock_score, max_batches, X_y_binary, caplog):
+    logger.info(f'at time: {time.time()}, in test: test_max_batches_output()')
     X, y = X_y_binary
     automl = AutoMLSearch(problem_type="binary", max_iterations=None, max_batches=max_batches)
     automl.search(X, y, data_checks=None)
@@ -1388,6 +1450,7 @@ def test_max_batches_output(mock_pipeline_fit, mock_score, max_batches, X_y_bina
 @patch('evalml.pipelines.BinaryClassificationPipeline.score', return_value={"Log Loss Binary": 0.8})
 @patch('evalml.pipelines.BinaryClassificationPipeline.fit')
 def test_max_batches_plays_nice_with_other_stopping_criteria(mock_fit, mock_score, X_y_binary):
+    logger.info(f'at time: {time.time()}, in test: test_max_batches_plays_nice_with_other_stopping_criteria()')
     X, y = X_y_binary
 
     # Use the old default when all are None
@@ -1409,12 +1472,14 @@ def test_max_batches_plays_nice_with_other_stopping_criteria(mock_fit, mock_scor
 
 @pytest.mark.parametrize("max_batches", [0, -1, -10, -np.inf])
 def test_max_batches_must_be_non_negative(max_batches):
+    logger.info(f'at time: {time.time()}, in test: test_max_batches_must_be_non_negative()')
 
     with pytest.raises(ValueError, match=f"Parameter max batches must be None or non-negative. Received {max_batches}."):
         AutoMLSearch(problem_type="binary", max_batches=max_batches)
 
 
 def test_data_split_binary(X_y_binary):
+    logger.info(f'at time: {time.time()}, in test: test_data_split_binary()')
     X, y = X_y_binary
     y[:] = 0
     y[0] = 1
@@ -1431,6 +1496,7 @@ def test_data_split_binary(X_y_binary):
 
 
 def test_data_split_multi(X_y_multi):
+    logger.info(f'at time: {time.time()}, in test: test_data_split_multi()')
     X, y = X_y_multi
     y[:] = 1
     y[0] = 0
@@ -1460,6 +1526,7 @@ def test_data_split_multi(X_y_multi):
 
 
 def test_get_default_primary_search_objective():
+    logger.info(f'at time: {time.time()}, in test: test_get_default_primary_search_objective()')
     assert isinstance(get_default_primary_search_objective("binary"), LogLossBinary)
     assert isinstance(get_default_primary_search_objective(ProblemTypes.BINARY), LogLossBinary)
     assert isinstance(get_default_primary_search_objective("multiclass"), LogLossMulticlass)
@@ -1472,6 +1539,7 @@ def test_get_default_primary_search_objective():
 
 @patch('evalml.tuners.skopt_tuner.SKOptTuner.add')
 def test_iterative_algorithm_pipeline_hyperparameters_make_pipeline_other_errors(mock_add, X_y_multi):
+    logger.info(f'at time: {time.time()}, in test: test_iterative_algorithm_pipeline_hyperparameters_make_pipeline_other_errors()')
     X, y = X_y_multi
     custom_hyperparameters = {
         "Imputer": {
@@ -1493,6 +1561,7 @@ def test_iterative_algorithm_pipeline_hyperparameters_make_pipeline_other_errors
 @patch('evalml.pipelines.BinaryClassificationPipeline.score')
 @patch('evalml.pipelines.BinaryClassificationPipeline.fit')
 def test_iterative_algorithm_pipeline_hyperparameters_make_pipeline_errors(mock_fit, mock_score, X_y_multi):
+    logger.info(f'at time: {time.time()}, in test: test_iterative_algorithm_pipeline_hyperparameters_make_pipeline_errors()')
     X, y = X_y_multi
     invalid_custom_hyperparameters = {
         "Imputer": {
@@ -1524,6 +1593,7 @@ def test_iterative_algorithm_pipeline_hyperparameters_make_pipeline_errors(mock_
 @patch('evalml.pipelines.BinaryClassificationPipeline.score')
 @patch('evalml.pipelines.BinaryClassificationPipeline.fit')
 def test_iterative_algorithm_pipeline_hyperparameters_make_pipeline(mock_fit, mock_score, X_y_multi):
+    logger.info(f'at time: {time.time()}, in test: test_iterative_algorithm_pipeline_hyperparameters_make_pipeline()')
     X, y = X_y_multi
     custom_hyperparameters = {
         "Imputer": {
@@ -1556,6 +1626,7 @@ def test_iterative_algorithm_pipeline_hyperparameters_make_pipeline(mock_fit, mo
 @patch('evalml.pipelines.BinaryClassificationPipeline.score')
 @patch('evalml.pipelines.BinaryClassificationPipeline.fit')
 def test_automl_ensembling_false(mock_fit, mock_score, X_y_binary):
+    logger.info(f'at time: {time.time()}, in test: test_automl_ensembling_false()')
     X, y = X_y_binary
     mock_score.return_value = {'Log Loss Binary': 1.0}
 
@@ -1567,6 +1638,7 @@ def test_automl_ensembling_false(mock_fit, mock_score, X_y_binary):
 @patch('evalml.pipelines.BinaryClassificationPipeline.score', return_value={"Log Loss Binary": 0.8})
 @patch('evalml.pipelines.BinaryClassificationPipeline.fit')
 def test_input_not_woodwork_logs_warning(mock_fit, mock_score, caplog, X_y_binary):
+    logger.info(f'at time: {time.time()}, in test: test_input_not_woodwork_logs_warning()')
     X, y = X_y_binary
     assert isinstance(X, np.ndarray)
     assert isinstance(y, np.ndarray)
@@ -1588,6 +1660,7 @@ def test_input_not_woodwork_logs_warning(mock_fit, mock_score, caplog, X_y_binar
 @patch('evalml.pipelines.BinaryClassificationPipeline.score', return_value={"Log Loss Binary": 0.8})
 @patch('evalml.pipelines.BinaryClassificationPipeline.fit')
 def test_search_with_text(mock_fit, mock_score):
+    logger.info(f'at time: {time.time()}, in test: test_search_with_text()')
     X = pd.DataFrame(
         {'col_1': ['I\'m singing in the rain! Just singing in the rain, what a glorious feeling, I\'m happy again!',
                    'In sleep he sang to me, in dreams he came... That voice which calls to me, and speaks my name.',
@@ -1611,6 +1684,7 @@ def test_search_with_text(mock_fit, mock_score):
 @patch('evalml.pipelines.BinaryClassificationPipeline.score', return_value={"Log Loss Binary": 0.8})
 @patch('evalml.pipelines.BinaryClassificationPipeline.fit')
 def test_pipelines_per_batch(mock_fit, mock_score, X_y_binary):
+    logger.info(f'at time: {time.time()}, in test: test_pipelines_per_batch()')
     def total_pipelines(automl, num_batches, batch_size):
         total = 1 + len(automl.allowed_pipelines)
         total += ((num_batches - 1) * batch_size)
@@ -1641,6 +1715,7 @@ def test_pipelines_per_batch(mock_fit, mock_score, X_y_binary):
 @patch('evalml.pipelines.BinaryClassificationPipeline.score', return_value={"Log Loss Binary": 0.8})
 @patch('evalml.pipelines.BinaryClassificationPipeline.fit')
 def test_automl_respects_random_state(mock_fit, mock_score, X_y_binary, dummy_classifier_estimator_class):
+    logger.info(f'at time: {time.time()}, in test: test_automl_respects_random_state')
 
     expected_random_state = get_random_state(42)
     X, y = X_y_binary

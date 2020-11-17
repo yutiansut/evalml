@@ -13,8 +13,13 @@ from evalml.pipelines.components.utils import get_estimators
 from evalml.pipelines.utils import make_pipeline
 from evalml.problem_types import ProblemTypes
 
+import time
+from evalml.utils.logger import get_logger
+logger = get_logger(__file__)
+
 
 def test_init(X_y_regression):
+    logger.info(f'at time: {time.time()}, in test: test_init()')
     X, y = X_y_regression
 
     automl = AutoMLSearch(problem_type='regression', objective="R2", max_iterations=3, n_jobs=4)
@@ -35,6 +40,7 @@ def test_init(X_y_regression):
 
 
 def test_random_state(X_y_regression):
+    logger.info(f'at time: {time.time()}, in test: test_random_state()')
     X, y = X_y_regression
     automl = AutoMLSearch(problem_type='regression', objective="R2", max_iterations=5, random_state=0)
     automl.search(X, y)
@@ -47,6 +53,7 @@ def test_random_state(X_y_regression):
 
 
 def test_categorical_regression(X_y_categorical_regression):
+    logger.info(f'at time: {time.time()}, in test: test_categorical_regression()')
     X, y = X_y_categorical_regression
     automl = AutoMLSearch(problem_type='regression', objective="R2", max_iterations=5, random_state=0)
     automl.search(X, y)
@@ -54,6 +61,7 @@ def test_categorical_regression(X_y_categorical_regression):
 
 
 def test_callback(X_y_regression):
+    logger.info(f'at time: {time.time()}, in test: test_callback()')
     X, y = X_y_regression
 
     counts = {
@@ -78,6 +86,7 @@ def test_callback(X_y_regression):
 
 
 def test_early_stopping(caplog, linear_regression_pipeline_class):
+    logger.info(f'at time: {time.time()}, in test: test_early_stopping()')
     tolerance = 0.005
     patience = 2
     automl = AutoMLSearch(problem_type='regression', objective='mse', max_time='60 seconds',
@@ -101,6 +110,7 @@ def test_early_stopping(caplog, linear_regression_pipeline_class):
 
 
 def test_plot_disabled_missing_dependency(X_y_regression, has_minimal_dependencies):
+    logger.info(f'at time: {time.time()}, in test: test_plot_disabled_missing_dependency()')
     X, y = X_y_regression
 
     automl = AutoMLSearch(problem_type='regression', max_iterations=3)
@@ -112,6 +122,7 @@ def test_plot_disabled_missing_dependency(X_y_regression, has_minimal_dependenci
 
 
 def test_plot_iterations_max_iterations(X_y_regression):
+    logger.info(f'at time: {time.time()}, in test: test_plot_iterations_max_iterations()')
     go = pytest.importorskip('plotly.graph_objects', reason='Skipping plotting test because plotly not installed')
     X, y = X_y_regression
 
@@ -130,6 +141,7 @@ def test_plot_iterations_max_iterations(X_y_regression):
 
 
 def test_plot_iterations_max_time(X_y_regression):
+    logger.info(f'at time: {time.time()}, in test: test_plot_iterations_max_time()')
     go = pytest.importorskip('plotly.graph_objects', reason='Skipping plotting test because plotly not installed')
     X, y = X_y_regression
 
@@ -148,6 +160,7 @@ def test_plot_iterations_max_time(X_y_regression):
 
 
 def test_log_metrics_only_passed_directly():
+    logger.info(f'at time: {time.time()}, in test: test_log_metrics_only_passed_directly()')
     with pytest.raises(ObjectiveNotFoundError, match="RootMeanSquaredLogError is not a valid Objective!"):
         AutoMLSearch(problem_type='regression', additional_objectives=['RootMeanSquaredLogError', 'MeanSquaredLogError'])
 
@@ -157,6 +170,7 @@ def test_log_metrics_only_passed_directly():
 
 
 def test_automl_allowed_pipelines_no_allowed_pipelines(X_y_regression):
+    logger.info(f'at time: {time.time()}, in test: test_automl_allowed_pipelines_no_allowed_pipelines()')
     X, y = X_y_regression
     automl = AutoMLSearch(problem_type='regression', allowed_pipelines=None, allowed_model_families=[])
     assert automl.allowed_pipelines is None
@@ -167,6 +181,7 @@ def test_automl_allowed_pipelines_no_allowed_pipelines(X_y_regression):
 @patch('evalml.pipelines.RegressionPipeline.score')
 @patch('evalml.pipelines.RegressionPipeline.fit')
 def test_automl_allowed_pipelines_specified_allowed_pipelines(mock_fit, mock_score, dummy_regression_pipeline_class, X_y_regression):
+    logger.info(f'at time: {time.time()}, in test: test_automl_allowed_pipelines_specified_allowed_pipelines()')
     X, y = X_y_regression
     automl = AutoMLSearch(problem_type='regression', allowed_pipelines=[dummy_regression_pipeline_class], allowed_model_families=None)
     mock_score.return_value = {automl.objective.name: 1.0}
@@ -185,6 +200,7 @@ def test_automl_allowed_pipelines_specified_allowed_pipelines(mock_fit, mock_sco
 @patch('evalml.pipelines.RegressionPipeline.score')
 @patch('evalml.pipelines.RegressionPipeline.fit')
 def test_automl_allowed_pipelines_specified_allowed_model_families(mock_fit, mock_score, X_y_regression, assert_allowed_pipelines_equal_helper):
+    logger.info(f'at time: {time.time()}, in test: test_automl_allowed_pipelines_specified_allowed_model_families()')
     X, y = X_y_regression
     automl = AutoMLSearch(problem_type='regression', allowed_pipelines=None, allowed_model_families=[ModelFamily.RANDOM_FOREST])
     mock_score.return_value = {automl.objective.name: 1.0}
@@ -213,6 +229,7 @@ def test_automl_allowed_pipelines_specified_allowed_model_families(mock_fit, moc
 @patch('evalml.pipelines.RegressionPipeline.score')
 @patch('evalml.pipelines.RegressionPipeline.fit')
 def test_automl_allowed_pipelines_init_allowed_both_not_specified(mock_fit, mock_score, X_y_regression, assert_allowed_pipelines_equal_helper):
+    logger.info(f'at time: {time.time()}, in test: test_automl_allowed_pipelines_init_allowed_both_not_specified()')
     X, y = X_y_regression
     automl = AutoMLSearch(problem_type='regression', allowed_pipelines=None, allowed_model_families=None)
     mock_score.return_value = {automl.objective.name: 1.0}
@@ -229,6 +246,7 @@ def test_automl_allowed_pipelines_init_allowed_both_not_specified(mock_fit, mock
 @patch('evalml.pipelines.RegressionPipeline.score')
 @patch('evalml.pipelines.RegressionPipeline.fit')
 def test_automl_allowed_pipelines_init_allowed_both_specified(mock_fit, mock_score, dummy_regression_pipeline_class, X_y_regression, assert_allowed_pipelines_equal_helper):
+    logger.info(f'at time: {time.time()}, in test: test_automl_allowed_pipelines_init_allowed_both_specified()')
     X, y = X_y_regression
     automl = AutoMLSearch(problem_type='regression', allowed_pipelines=[dummy_regression_pipeline_class], allowed_model_families=[ModelFamily.RANDOM_FOREST])
     mock_score.return_value = {automl.objective.name: 1.0}
@@ -246,6 +264,7 @@ def test_automl_allowed_pipelines_init_allowed_both_specified(mock_fit, mock_sco
 @patch('evalml.pipelines.RegressionPipeline.score')
 @patch('evalml.pipelines.RegressionPipeline.fit')
 def test_automl_allowed_pipelines_search(mock_fit, mock_score, dummy_regression_pipeline_class, X_y_regression):
+    logger.info(f'at time: {time.time()}, in test: test_automl_allowed_pipelines_search()')
     X, y = X_y_regression
     mock_score.return_value = {'R2': 1.0}
 

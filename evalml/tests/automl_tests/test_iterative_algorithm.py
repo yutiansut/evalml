@@ -14,12 +14,18 @@ from evalml.pipelines.components.transformers import TextFeaturizer
 from evalml.problem_types import ProblemTypes
 from evalml.utils import check_random_state_equality
 
+import time
+from evalml.utils.logger import get_logger
+logger = get_logger(__file__)
+
 
 def test_iterative_algorithm_init_iterative():
+    logger.info(f'at time: {time.time()}, in test: test_iterative_algorithm_init_iterative()')
     IterativeAlgorithm()
 
 
 def test_iterative_algorithm_init():
+    logger.info(f'at time: {time.time()}, in test: test_iterative_algorithm_init()')
     algo = IterativeAlgorithm()
     assert algo.pipeline_number == 0
     assert algo.batch_number == 0
@@ -27,6 +33,7 @@ def test_iterative_algorithm_init():
 
 
 def test_iterative_algorithm_allowed_pipelines(logistic_regression_binary_pipeline_class):
+    logger.info(f'at time: {time.time()}, in test: test_iterative_algorithm_allowed_pipelines()')
     allowed_pipelines = [logistic_regression_binary_pipeline_class]
     algo = IterativeAlgorithm(allowed_pipelines=allowed_pipelines)
     assert algo.pipeline_number == 0
@@ -63,6 +70,7 @@ def dummy_binary_pipeline_classes():
 
 
 def test_iterative_algorithm_empty(dummy_binary_pipeline_classes):
+    logger.info(f'at time: {time.time()}, in test: test_iterative_algorithm_empty()')
     algo = IterativeAlgorithm()
     assert algo.pipeline_number == 0
     assert algo.batch_number == 0
@@ -82,6 +90,7 @@ def test_iterative_algorithm_empty(dummy_binary_pipeline_classes):
 @pytest.mark.parametrize("ensembling_value", [True, False])
 @patch('evalml.pipelines.components.ensemble.StackedEnsembleClassifier._stacking_estimator_class')
 def test_iterative_algorithm_results(mock_stack, ensembling_value, dummy_binary_pipeline_classes):
+    logger.info(f'at time: {time.time()}, in test: test_iterative_algorithm_results()')
     algo = IterativeAlgorithm(allowed_pipelines=dummy_binary_pipeline_classes, ensembling=ensembling_value)
     assert algo.pipeline_number == 0
     assert algo.batch_number == 0
@@ -188,6 +197,7 @@ def test_iterative_algorithm_one_allowed_pipeline(ensembling_value, logistic_reg
 def test_iterative_algorithm_instantiates_text(dummy_classifier_estimator_class):
     class MockTextClassificationPipeline(BinaryClassificationPipeline):
         component_graph = [TextFeaturizer, dummy_classifier_estimator_class]
+    logger.info(f'at time: {time.time()}, in test: test_iterative_algorithm_instantiates_text()')
 
     algo = IterativeAlgorithm(allowed_pipelines=[MockTextClassificationPipeline], text_columns=['text_col_1', 'text_col_2'])
     pipeline = algo.next_batch()[0]

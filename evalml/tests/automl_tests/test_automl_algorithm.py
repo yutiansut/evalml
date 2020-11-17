@@ -2,6 +2,10 @@ import pytest
 
 from evalml.automl.automl_algorithm import AutoMLAlgorithm
 
+import time
+from evalml.utils.logger import get_logger
+logger = get_logger(__file__)
+
 
 class DummyAlgorithm(AutoMLAlgorithm):
     def __init__(self, dummy_pipelines=None):
@@ -17,6 +21,7 @@ class DummyAlgorithm(AutoMLAlgorithm):
 
 
 def test_automl_algorithm_dummy():
+    logger.info(f'at time: {time.time()}, in test: test_automl_algorithm_dummy()')
     algo = DummyAlgorithm()
     assert algo.pipeline_number == 0
     assert algo.batch_number == 0
