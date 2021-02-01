@@ -53,6 +53,8 @@ def explain_prediction(pipeline, input_features, top_k=3, training_data=None, in
 
     if output_format not in {"text", "dict"}:
         raise ValueError(f"Parameter output_format must be either text or dict. Received {output_format}")
+    if "Delayed Feature Transformer" in pipeline.component_graph:
+        import pdb; pdb.set_trace()
     return _make_single_prediction_shap_table(pipeline, input_features, top_k, training_data, include_shap_values,
                                               output_format=output_format)
 
