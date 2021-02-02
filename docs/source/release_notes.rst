@@ -4,6 +4,7 @@ Release Notes
 **Future Releases**
     * Enhancements
         * Added "dataframe" output format for prediction explanations :pr:`1781`
+        * Sped up permutation importance for some pipelines :pr:`1762`
     * Fixes
     * Changes
     * Documentation Changes
@@ -15,7 +16,6 @@ Release Notes
         * Added support for ``scikit-learn`` ``v0.24.0`` :pr:`1733`
         * Added support for ``scipy`` ``v1.6.0`` :pr:`1752`
         * Added SVM Classifier and Regressor to estimators :pr:`1714` :pr:`1761`
-        * Sped up permutation importance for some pipelines :pr:`1762`
     * Fixes
         * Addressed bug with ``partial_dependence`` and categorical data with more categories than grid resolution :pr:`1748`
         * Removed ``random_state`` arg from ``get_pipelines`` in ``AutoMLSearch`` :pr:`1719`
