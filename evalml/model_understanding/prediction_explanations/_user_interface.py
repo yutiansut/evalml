@@ -223,7 +223,10 @@ def _make_single_prediction_shap_table(pipeline, input_features, top_k=3, traini
 
     table_makers = {ProblemTypes.REGRESSION: _RegressionSHAPTable(),
                     ProblemTypes.BINARY: _BinarySHAPTable(class_names),
-                    ProblemTypes.MULTICLASS: _MultiClassSHAPTable(class_names)}
+                    ProblemTypes.MULTICLASS: _MultiClassSHAPTable(class_names),
+                    ProblemTypes.TIME_SERIES_BINARY: _BinarySHAPTable(class_names),
+                    ProblemTypes.TIME_SERIES_MULTICLASS: _MultiClassSHAPTable(class_names),
+                    ProblemTypes.TIME_SERIES_REGRESSION: _RegressionSHAPTable()}
 
     table_maker_class = table_makers[pipeline.problem_type]
 

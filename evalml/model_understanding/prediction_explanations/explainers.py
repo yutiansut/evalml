@@ -55,7 +55,7 @@ def explain_prediction(pipeline, input_features, top_k=3, training_data=None, in
         raise ValueError(f"Parameter output_format must be either text or dict. Received {output_format}")
     if "Delayed Feature Transformer" in pipeline.component_graph:
         input_features_idx = training_data.index.get_loc(input_features.index[0])
-        input_features = training_data.iloc[0:input_features_idx+1]
+        input_features = training_data.iloc[0:input_features_idx + 1]
     return _make_single_prediction_shap_table(pipeline, input_features, top_k, training_data, include_shap_values,
                                               output_format=output_format)
 
