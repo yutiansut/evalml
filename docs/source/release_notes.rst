@@ -3,6 +3,7 @@ Release Notes
 
 **Future Releases**
     * Enhancements
+        * Added support to ``explain_predictions`` for time-series data :pr`1782`
     * Fixes
     * Changes
     * Documentation Changes
