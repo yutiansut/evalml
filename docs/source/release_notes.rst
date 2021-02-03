@@ -8,6 +8,7 @@ Release Notes
     * Fixes
     * Changes
     * Documentation Changes
+        * Added section on conda to the contributing guide :pr:`1771`
 
 **v0.18.1 Feb. 1, 2021**
     * Enhancements
@@ -29,7 +30,6 @@ Release Notes
     * Documentation Changes
         * Add Twitter and Github link to documentation toolbar :pr:`1754`
         * Added Open Graph info to documentation :pr:`1758`
-        * Added section on conda to the contributing guide :pr:`1771`
     * Testing Changes
 
 .. warning::
